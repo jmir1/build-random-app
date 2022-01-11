@@ -1,0 +1,74 @@
+name: Build job
+
+on:
+  # Manual triggers
+  workflow_dispatch:
+    inputs:
+      release-tag:
+        description: What to call this build
+        required: true
+      gradle-command:
+        description: What to do
+        required: false
+        default: 'assembleDevDebug'
+      artifact-path:
+        description: What to release
+        required: false
+        default: 'app/build/outputs/apk/dev/debug/app-dev-universal-debug.apk'
+      artifact-name:
+        description: What to call that artifact
+        required: false
+        default 'app.apk'
+      git-repo:
+        description: Get Repo (Optional)
+        required: false
+        default: 'jmir1/aniyomi'
+      git-ref:
+        description: Git Ref (Optional)
+        required: false
+        default: 'master'
+      dry-run:
+        description: Creates a draft release
+        required: false
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.git-repo }}
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.git-ref }}
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Build APK
+        uses: gradle/gradle-command-action@v1
+        with:
+          arguments: ${{ github.event.inputs.gradle-command }}
+          distributions-cache-enabled: true
+          dependencies-cache-enabled: true
+          configuration-cache-enabled: true
+
+      - name: Clean up build artifacts
+        run: |
+          set -e
+          cp ${{ github.event.inputs.artifact-path }} ${{ github.event.inputs.artifact-name }}
+      - name: Create release
+        uses: softprops/action-gh-release@v0.1.14
+        with:
+          tag_name: ${{ github.event.inputs.release-tag }}
+          name: ${{ github.event.inputs.release-tag }}
+          body: |
+            awesome release
+          files: |
+            ${{ github.event.inputs.artifact-name }}
+          draft: ${{ github.event.inputs.dry-run != '' }}
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
