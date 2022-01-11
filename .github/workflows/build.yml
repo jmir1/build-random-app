@@ -18,7 +18,7 @@ on:
       artifact-name:
         description: What to call that artifact
         required: false
-        default 'app.apk'
+        default: 'app.apk'
       git-repo:
         description: Get Repo (Optional)
         required: false
