@@ -63,6 +63,7 @@ jobs:
           distributions-cache-enabled: true
           dependencies-cache-enabled: true
           configuration-cache-enabled: true
+        if: github.event.inputs.gradle-command != ''
 
       - name: Clean up build artifacts
         run: |
