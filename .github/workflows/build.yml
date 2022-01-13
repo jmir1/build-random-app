@@ -7,6 +7,9 @@ on:
       release-tag:
         description: What to call this build
         required: true
+      setup-command:
+        description: What to do before building
+        required: false
       gradle-command:
         description: What to do
         required: false
@@ -46,6 +49,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+          
+      - name: Set up
+        if: github.event.inputs.git-ref != ''
+        run: |
+          set -e
+          ${{ github.events.inputs.setup-command }}
 
       - name: Build APK
         uses: gradle/gradle-command-action@v1
