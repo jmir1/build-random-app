@@ -54,7 +54,7 @@ jobs:
         if: github.event.inputs.git-ref != ''
         run: |
           set -e
-          ${{ github.events.inputs.setup-command }}
+          ${{ github.event.inputs.setup-command }}
 
       - name: Build APK
         uses: gradle/gradle-command-action@v1
