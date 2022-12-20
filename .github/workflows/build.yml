@@ -24,6 +24,7 @@ jobs:
           
       - name: Build APK
         run: |
+          sudo apt-get install nasm
           cd buildscripts
           ./download.sh
           ./buildall.sh --arch x86 mpv
